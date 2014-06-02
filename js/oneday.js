@@ -44,7 +44,7 @@ module.exports = function(emitter) {
       currentTranslation: 0
     },
     axisGutter = 40, gutter = 40,
-    buffer = 2,
+    buffer = 1,
     pools = [], poolGroup,
     xScale = d3.time.scale.utc(), xAxis,
     currentCenter, data, tidelineData, renderedData = [], endpoints,
@@ -268,23 +268,6 @@ module.exports = function(emitter) {
 
     container.currentCenter(container.getCurrentDomain().center);
 
-    var tickFormat = d3.time.format.utc.multi([
-      ['%b %-d', function(d) { return d.getUTCHours() === 0; }],
-      ['%-I am', function(d) { return d.getUTCHours() < 11; }],
-      ['%-I pm', function(d) { return true; }],
-    ]);
-
-    xAxis = d3.svg.axis()
-      .scale(xScale)
-      .orient('top')
-      .outerTickSize(0)
-      .innerTickSize(15)
-      .tickFormat(tickFormat);
-
-    mainGroup.select('#tidelineXAxis').call(xAxis);
-
-    mainGroup.selectAll('#tidelineXAxis g.tick text').style('text-anchor', 'start').attr('transform', 'translate(5,15)');
-
     if (nav.scrollNav) {
       nav.scrollScale = d3.time.scale.utc()
         .domain([endpoints[0], container.initialEndpoints[0]])
@@ -328,8 +311,6 @@ module.exports = function(emitter) {
         mainGroup.select('#tidelineTooltips').attr('transform', 'translate(' + e.translate[0] + ',0)');
         mainGroup.select('#tidelineAnnotations').attr('transform', 'translate(' + e.translate[0] + ',0)');
         d3.select('#annotationsClipPath rect').attr('transform', 'translate(' + -e.translate[0] + ',0)');
-        mainGroup.select('.d3-x.d3-axis').call(xAxis);
-        mainGroup.selectAll('#tidelineXAxis g.tick text').style('text-anchor', 'start').attr('transform', 'translate(5,15)');
         if (scrollHandleTrigger) {
           mainGroup.select('.scrollThumb').transition().ease('linear').attr('x', function(d) {
             d.x = nav.scrollScale(xScale.domain()[0]);
