@@ -6,6 +6,7 @@ bower_components/
 dist/
 example/bundle.js
 example/data/blip-output.json
+example/data/UTC-data.json
 example/dist/
 node_modules/
 test/test.js
