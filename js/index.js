@@ -42,9 +42,13 @@ module.exports = {
     bolus: require('./plot/bolus'),
     carbs: require('./plot/carbs'),
     cbg: require('./plot/cbg'),
+    cbgutc: require('./plot/cbg-utc'),
+    cbgpac: require('./plot/cbg-pacific'),
     message: require('./plot/message'),
     SMBGTime: require('./plot/smbgtime'),
     smbg: require('./plot/smbg'),
+    smbgutc: require('./plot/smbg-utc'),
+    smbgpac: require('./plot/smbg-pacific'),
     stats: {
       puddle: require('./plot/stats/puddle'),
       widget: require('./plot/stats/widget')

@@ -9,8 +9,8 @@ var _ = window._;
 // tideline dependencies & plugins
 var tideline = window.tideline;
 var preprocess = window.tideline.preprocess;
-var dualBG = window.tideline.experiments;
-var chartDailyFactory = dualBG.oneday;
+var experiment = window.tideline.experiments;
+var chartDailyFactory = experiment.oneday;
 
 var log = window.bows('Dual BG Experiment');
 
@@ -42,7 +42,7 @@ d3.json('data/UTC-data.json', function(data) {
   data = preprocess.processData(data);
 
   log('Initial one-day view.');
-  oneDay.load(data).locate('2014-03-06T09:00:00.000Z');
+  oneDay.load(data).locate('2014-05-26T00:00:00');
   // attach click handlers to set up programmatic pan
   $('#tidelineNavForward').on('click', oneDay.panForward);
   $('#tidelineNavBack').on('click', oneDay.panBack);

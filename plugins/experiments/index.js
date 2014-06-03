@@ -3,5 +3,5 @@
  */
 
 module.exports = {
-  oneday: require('./dualBGdailyfactory')
+  oneday: require('./compareBGdailyfactory')
 };

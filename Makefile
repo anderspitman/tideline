@@ -21,7 +21,7 @@ experiment:
 	browserify --debug plugins/experiments/index.js --standalone tideline.experiments > example/dist/tideline-experiments.js
 	browserify --debug plugins/data/preprocess/index.js --standalone tideline.preprocess > example/dist/tideline-preprocess.js
 	browserify --debug plugins/data/watson/index.js --standalone tideline.watson > example/dist/tideline-watson.js
-	browserify --debug example/dualBGexperiment.js > example/bundle.js
+	browserify --debug example/compareBGexperiment.js > example/bundle.js
 	lessc example/example.less example/example.css
 
 test:

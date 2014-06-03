@@ -26,7 +26,7 @@ function chartDailyFactory(el, options) {
   chart.emitter = emitter;
   chart.options = options;
 
-  var poolBGPacific, poolBGRaw;
+  var poolBGUTC, poolBGPacific, poolBGRaw;
 
   var SMBG_SIZE = 16;
 
@@ -57,14 +57,24 @@ function chartDailyFactory(el, options) {
 
   chart.setupPools = function() {
 
+    // blood glucose data pool #0
+    poolBGUTC = chart.newPool()
+      .id('poolBG_utc', chart.poolGroup())
+      .label([{
+        'main': 'Blood Glucose',
+        'light': ' (UTC, Timezone-corrected == THE TRUTH)'
+      }])
+      .legend(['bg'])
+      .index(chart.pools().indexOf(poolBGUTC))
+      .weight(1.5);
+
     // blood glucose data pool #1
     poolBGPacific = chart.newPool()
       .id('poolBG_pacific', chart.poolGroup())
       .label([{
         'main': 'Blood Glucose',
-        'light': ' (' + chart.options.bgUnits + ') Pacific Time'
+        'light': ' (UTC from current timezone, shown as Pacific)'
       }])
-      .legend(['bg'])
       .index(chart.pools().indexOf(poolBGPacific))
       .weight(1.5);
 
@@ -73,7 +83,7 @@ function chartDailyFactory(el, options) {
       .id('poolBG_raw', chart.poolGroup())
       .label([{
         'main': 'Blood Glucose',
-        'light': ' (' + chart.options.bgUnits + ') Raw Device Time'
+        'light': ' (Raw Device Time)'
       }])
       .index(chart.pools().indexOf(poolBGRaw))
       .weight(1.5);
@@ -83,6 +93,8 @@ function chartDailyFactory(el, options) {
     chart.setAnnotation().setTooltip();
 
     // add tooltips
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGUTC.id()), 'cbg');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGUTC.id()), 'smbg');
     chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGPacific.id()), 'cbg');
     chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGPacific.id()), 'smbg');
     chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGRaw.id()), 'cbg');
@@ -105,6 +117,22 @@ function chartDailyFactory(el, options) {
         return d;
       }
     });
+
+    var scaleBGUTC = scales.bgLog(allBG, poolBGUTC, SMBG_SIZE/2);
+    // set up y-axis
+    poolBGUTC.yAxis(d3.svg.axis()
+      .scale(scaleBGUTC)
+      .orient('left')
+      .outerTickSize(0)
+      .tickValues(scales.bgTicks(allBG))
+      .tickFormat(d3.format('g')));
+
+    // add CBG data to BG pool
+    poolBGUTC.addPlotType('cbg', tideline.plot.cbgutc(poolBGUTC, {yScale: scaleBGUTC}), true, true);
+
+    // add SMBG data to BG pool
+    poolBGUTC.addPlotType('smbg', tideline.plot.smbgutc(poolBGUTC, {yScale: scaleBGUTC}), true, true);
+
     var scaleBGPacific = scales.bgLog(allBG, poolBGPacific, SMBG_SIZE/2);
     // set up y-axis
     poolBGPacific.yAxis(d3.svg.axis()
@@ -130,10 +158,10 @@ function chartDailyFactory(el, options) {
     }), false, true);
 
     // add CBG data to BG pool
-    poolBGPacific.addPlotType('cbg', tideline.plot.cbg(poolBGPacific, {yScale: scaleBGPacific}), true, true);
+    poolBGPacific.addPlotType('cbg', tideline.plot.cbgpac(poolBGPacific, {yScale: scaleBGPacific}), true, true);
 
     // add SMBG data to BG pool
-    poolBGPacific.addPlotType('smbg', tideline.plot.smbg(poolBGPacific, {yScale: scaleBGPacific}), true, true);
+    poolBGPacific.addPlotType('smbg', tideline.plot.smbgpac(poolBGPacific, {yScale: scaleBGPacific}), true, true);
 
     var scaleBGRaw = scales.bgLog(allBG, poolBGRaw, SMBG_SIZE/2);
     // set up y-axis
@@ -160,10 +188,10 @@ function chartDailyFactory(el, options) {
     }), false, true);
 
     // add CBG data to BG pool
-    poolBGRaw.addPlotType('cbg', tideline.plot.cbg(poolBGRaw, {yScale: scaleBGRaw}), true, true);
+    poolBGRaw.addPlotType('cbg', tideline.plot.cbgpac(poolBGRaw, {yScale: scaleBGRaw}), true, true);
 
     // add SMBG data to BG pool
-    poolBGRaw.addPlotType('smbg', tideline.plot.smbg(poolBGRaw, {yScale: scaleBGRaw}), true, true);
+    poolBGRaw.addPlotType('smbg', tideline.plot.smbgpac(poolBGRaw, {yScale: scaleBGRaw}), true, true);
 
     return chart;
   };
