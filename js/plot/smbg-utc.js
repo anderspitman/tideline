@@ -71,7 +71,7 @@ module.exports = function(pool, opts) {
       circles.exit().remove();
 
       // tooltips
-      d3.selectAll('.d3-circle-smbg').on('mouseover', function() {
+      selection.selectAll('.d3-circle-smbg').on('mouseover', function() {
         if (d3.select(this).classed('d3-bg-low')) {
           smbg.addTooltip(d3.select(this).datum(), 'low');
         }
@@ -82,7 +82,7 @@ module.exports = function(pool, opts) {
           smbg.addTooltip(d3.select(this).datum(), 'high');
         }
       });
-      d3.selectAll('.d3-circle-smbg').on('mouseout', function() {
+      selection.selectAll('.d3-circle-smbg').on('mouseout', function() {
         var id = d3.select(this).attr('id').replace('smbg_', 'tooltip_');
         d3.select('#' + id).remove();
       });
@@ -90,7 +90,7 @@ module.exports = function(pool, opts) {
   }
 
   smbg.addTooltip = function(d, category) {
-    d3.select('#' + 'tidelineTooltips_smbg')
+    d3.select('#' + 'tidelineTooltips_smbg_utc')
       .call(pool.tooltips(),
         d,
         // tooltipXPos

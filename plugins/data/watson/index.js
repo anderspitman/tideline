@@ -34,6 +34,7 @@ if ((typeof window !== 'undefined') && (typeof window._ !== 'undefined')) {
 else {
   var _ = require('lodash');
 }
+var moment = require('moment-timezone');
 
 try {
   var log = window.bows('Watson');
@@ -48,10 +49,11 @@ module.exports = {
   normalize: function(i) {
     try {
       if (i.utcTime) {
-        var d = new Date(i.utcTime);
-        var offsetMinutes = d.getTimezoneOffset();
-        d.setUTCMinutes(d.getUTCMinutes() - offsetMinutes);
-        i.normalTime = d.toISOString();
+        // var d = new Date(i.utcTime);
+        // var offsetMinutes = d.getTimezoneOffset();
+        // d.setUTCMinutes(d.getUTCMinutes() - offsetMinutes);
+        // i.normalTime = d.toISOString();
+        i.normalTime = moment(i.utcTime).tz('US/Pacific').format();
       }
       else if (i.type === 'basal-rate-segment') {
         i.normalTime = i.start + this.APPEND;

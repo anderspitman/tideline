@@ -288,7 +288,7 @@ module.exports = function(emitter) {
           container.renderedData(xScale.domain());
           if (!mostRecent) {
             for (var j = 0; j < pools.length; j++) {
-              pools[j].render(poolGroup, container.renderedData());
+              pools[j].render(poolGroup, {data: container.renderedData(), domain: container.getCurrentDomain()});
             }
           }
           container.currentCenter(container.getCurrentDomain().center);

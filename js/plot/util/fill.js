@@ -16,6 +16,7 @@
  */
 var d3 = require('../../lib/').d3;
 var _ = require('../../lib/')._;
+var moment = require('moment-timezone');
 
 var log = require('../../lib/').bows('Fill');
 
@@ -43,17 +44,17 @@ module.exports = function(pool, opts) {
     fills.push({
       width: opts.xScale(end) - opts.xScale(start),
       x: opts.xScale(start),
-      fill: opts.classes[start.getUTCHours()]
+      fill: opts.classes[start.getHours()]
     });
   }
 
-  function durationSegmentedDomain() {
-    var first = new Date(opts.endpoints[0]);
-    var last = new Date(opts.endpoints[1]);
+  function durationSegmentedDomain(domain) {
+    var first = moment(domain.start).startOf('day');
+    var last = moment(domain.end).endOf('day');
     // make sure we encapsulate the domain completely by padding the start and end with `opts.duration`
-    first.setUTCHours(first.getUTCHours() - first.getUTCHours() % opts.duration - opts.duration);
-    last.setUTCHours(last.getUTCHours() + last.getUTCHours() % opts.duration + opts.duration);
-    return d3.time.hour.utc.range(first, last, opts.duration);
+    // first.setUTCHours(first.getUTCHours() - first.getUTCHours() % opts.duration - opts.duration);
+    // last.setUTCHours(last.getUTCHours() + last.getUTCHours() % opts.duration + opts.duration);
+    return d3.time.hour.range(first, last, opts.duration);
   }
 
   function fill(selection) {
@@ -62,7 +63,7 @@ module.exports = function(pool, opts) {
     }
     var i, range;
 
-    range = durationSegmentedDomain();
+    range = durationSegmentedDomain(selection.data()[0]);
     for (i = 0; i < range.length - 1; i++) {
       pushFillFor(range[i], range[i + 1]);
     }
@@ -71,9 +72,9 @@ module.exports = function(pool, opts) {
       fills.shift();
     }
 
-    selection.selectAll('rect')
-      .data(fills)
-      .enter()
+    var toFill = selection.selectAll('rect').data(fills);
+
+    toFill.enter()
       .append('rect')
       .attr({
         'x': function(d, i) {
@@ -123,19 +124,23 @@ module.exports = function(pool, opts) {
         }
       });
 
+    toFill.exit().remove();
+
     if (opts.guidelines) {
-      var linesGroup = pool.group().append('g')
-        .attr('id', pool.id() + '_guidelines');
-      _.each(opts.guidelines, function(guide){
-        linesGroup.append('line')
-          .attr({
-            'class': 'd3-line-guide ' + guide['class'],
-            'x1': opts.xScale.range()[0],
-            'x2': opts.xScale.range()[1],
-            'y1': opts.yScale(guide.height),
-            'y2': opts.yScale(guide.height)
-          });
-      });
+      var linesGroup = pool.group().selectAll('#' + pool.id() + '_guidelines').data([opts.guidlines]);
+      linesGroup.enter().append('g').attr('id', pool.id() + '_guidelines');
+      var lines = linesGroup.selectAll('line')
+        .data(opts.guidelines);
+      lines.enter()
+        .append('line')
+        .attr({
+          'class': function(d) { return 'd3-line-guide ' + d['class']; },
+          'x1': opts.xScale.range()[0],
+          'x2': opts.xScale.range()[1],
+          'y1': function(d) { return opts.yScale(d.height); },
+          'y2': function(d) { return opts.yScale(d.height); }
+        });
+      linesGroup.exit().remove();
     }
   }
 

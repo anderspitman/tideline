@@ -37,8 +37,9 @@ function Pool (container) {
     annotations,
     tooltips;
 
-  this.render = function(selection, poolData) {
+  this.render = function(selection, opts) {
     var pool = this;
+    var poolData = opts.data;
     plotTypes.forEach(function(plotType) {
       if (container.dataFill[plotType.type]) {
         plotType.data = _.where(poolData, {'type': plotType.type});
@@ -53,7 +54,7 @@ function Pool (container) {
         statsGroup.enter().append('g').attr('id', id + '_stats').call(plotType.plot);
       }
       else {
-        pool.noDataFill(plotType);
+        pool.noDataFill(plotType, opts.domain);
       }
     });
 
@@ -177,10 +178,12 @@ function Pool (container) {
     return this;
   };
 
-  this.noDataFill = _.once(function(plotType) {
-    mainSVG.select('#' + id).append('g').attr('id', id + '_' + plotType.type).call(plotType.plot);
+  this.noDataFill = function(plotType, domain) {
+    var noDataFillGroup = mainSVG.select('#' + id).selectAll('#' + id + '_' + plotType.type).data([domain]);
+    noDataFillGroup.enter().append('g').attr('id', id + '_' + plotType.type);
+    noDataFillGroup.call(plotType.plot);
     return this;
-  });
+  };
 
   // getters & setters
   this.id = function(x, selection) {

@@ -17,7 +17,6 @@
 
 var d3 = require('../lib/').d3;
 var _ = require('../lib/')._;
-var moment = require('moment-timezone');
 
 var log = require('../lib/').bows('CBG');
 
@@ -35,10 +34,6 @@ module.exports = function(pool, opts) {
   };
 
   _.defaults(opts, defaults);
-
-  cbg.dateTransformer = function(d) {
-    return moment(d.deviceTime).tz('US/Pacific').format();
-  };
 
   function cbg(selection) {
     opts.xScale = pool.xScale().copy();
@@ -67,7 +62,7 @@ module.exports = function(pool, opts) {
       });
       cbgLow.attr({
           'cx': function(d) {
-            return opts.xScale(Date.parse(cbg.dateTransformer(d)));
+            return opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00')));
           },
           'cy': function(d) {
             return opts.yScale(d.value);
@@ -83,7 +78,7 @@ module.exports = function(pool, opts) {
         .classed({'d3-circle-cbg': true, 'd3-bg-low': true});
       cbgTarget.attr({
           'cx': function(d) {
-            return opts.xScale(Date.parse(cbg.dateTransformer(d)));
+            return opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00')));
           },
           'cy': function(d) {
             return opts.yScale(d.value);
@@ -96,7 +91,7 @@ module.exports = function(pool, opts) {
         .classed({'d3-circle-cbg': true, 'd3-bg-target': true});
       cbgHigh.attr({
           'cx': function(d) {
-            return opts.xScale(Date.parse(cbg.dateTransformer(d)));
+            return opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00')));
           },
           'cy': function(d) {
             return opts.yScale(d.value);
@@ -129,11 +124,11 @@ module.exports = function(pool, opts) {
   }
 
   cbg.addTooltip = function(d, category) {
-    d3.select('#' + 'tidelineTooltips_cbg_pac')
+    d3.select('#' + 'tidelineTooltips_cbg_raw')
       .call(pool.tooltips(),
         d,
         // tooltipXPos
-        opts.xScale(Date.parse(cbg.dateTransformer(d))),
+        opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00'))),
         'cbg',
         // timestamp
         false,
@@ -141,7 +136,7 @@ module.exports = function(pool, opts) {
         opts.tooltipSize,
         opts.tooltipSize,
         // imageX
-        opts.xScale(Date.parse(cbg.dateTransformer(d))),
+        opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00'))),
         // imageY
         function() {
           if ((category === 'low') || (category === 'target')) {
@@ -152,7 +147,7 @@ module.exports = function(pool, opts) {
           }
         },
         // textX
-        opts.xScale(Date.parse(cbg.dateTransformer(d))) + opts.tooltipSize / 2,
+        opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00'))) + opts.tooltipSize / 2,
         // textY
         function() {
           if ((category === 'low') || (category === 'target')) {

@@ -93,12 +93,12 @@ function chartDailyFactory(el, options) {
     chart.setAnnotation().setTooltip();
 
     // add tooltips
-    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGUTC.id()), 'cbg');
-    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGUTC.id()), 'smbg');
-    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGPacific.id()), 'cbg');
-    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGPacific.id()), 'smbg');
-    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGRaw.id()), 'cbg');
-    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGRaw.id()), 'smbg');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGUTC.id()), 'cbg_utc');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGUTC.id()), 'smbg_utc');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGPacific.id()), 'cbg_pac');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGPacific.id()), 'smbg_pac');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGRaw.id()), 'cbg_raw');
+    chart.tooltips().addGroup(d3.select('#' + chart.id()).select('#' + poolBGRaw.id()), 'smbg_raw');
 
     return chart;
   };
@@ -133,6 +133,11 @@ function chartDailyFactory(el, options) {
     // add SMBG data to BG pool
     poolBGUTC.addPlotType('smbg', tideline.plot.smbgutc(poolBGUTC, {yScale: scaleBGUTC}), true, true);
 
+    poolBGUTC.addPlotType('message', tideline.plot.message(poolBGUTC, {
+      size: 30,
+      emitter: emitter
+    }), true, true);
+
     var scaleBGPacific = scales.bgLog(allBG, poolBGPacific, SMBG_SIZE/2);
     // set up y-axis
     poolBGPacific.yAxis(d3.svg.axis()
@@ -163,6 +168,11 @@ function chartDailyFactory(el, options) {
     // add SMBG data to BG pool
     poolBGPacific.addPlotType('smbg', tideline.plot.smbgpac(poolBGPacific, {yScale: scaleBGPacific}), true, true);
 
+    poolBGPacific.addPlotType('message', tideline.plot.message(poolBGPacific, {
+      size: 30,
+      emitter: emitter
+    }), true, true);
+
     var scaleBGRaw = scales.bgLog(allBG, poolBGRaw, SMBG_SIZE/2);
     // set up y-axis
     poolBGRaw.yAxis(d3.svg.axis()
@@ -188,10 +198,15 @@ function chartDailyFactory(el, options) {
     }), false, true);
 
     // add CBG data to BG pool
-    poolBGRaw.addPlotType('cbg', tideline.plot.cbgpac(poolBGRaw, {yScale: scaleBGRaw}), true, true);
+    poolBGRaw.addPlotType('cbg', tideline.plot.cbgraw(poolBGRaw, {yScale: scaleBGRaw}), true, true);
 
     // add SMBG data to BG pool
-    poolBGRaw.addPlotType('smbg', tideline.plot.smbgpac(poolBGRaw, {yScale: scaleBGRaw}), true, true);
+    poolBGRaw.addPlotType('smbg', tideline.plot.smbgraw(poolBGRaw, {yScale: scaleBGRaw}), true, true);
+
+    poolBGRaw.addPlotType('message', tideline.plot.message(poolBGRaw, {
+      size: 30,
+      emitter: emitter
+    }), true, true);
 
     return chart;
   };
@@ -244,7 +259,7 @@ function chartDailyFactory(el, options) {
 
     // render pools
     _.each(chart.pools(), function(pool) {
-      pool.render(chart.poolGroup(), chart.renderedData());
+      pool.render(chart.poolGroup(), {data: chart.renderedData(), domain: {start: start, end: end}});
     });
 
     chart.setAtDate(start, atMostRecent);

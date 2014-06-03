@@ -44,11 +44,13 @@ module.exports = {
     cbg: require('./plot/cbg'),
     cbgutc: require('./plot/cbg-utc'),
     cbgpac: require('./plot/cbg-pacific'),
+    cbgraw: require('./plot/cbg-raw'),
     message: require('./plot/message'),
     SMBGTime: require('./plot/smbgtime'),
     smbg: require('./plot/smbg'),
     smbgutc: require('./plot/smbg-utc'),
     smbgpac: require('./plot/smbg-pacific'),
+    smbgraw: require('./plot/smbg-raw'),
     stats: {
       puddle: require('./plot/stats/puddle'),
       widget: require('./plot/stats/widget')

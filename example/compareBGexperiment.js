@@ -38,10 +38,10 @@ oneDay.emitter.on('mostRecent', function(mostRecent) {
 // load data and draw charts
 d3.json('data/UTC-data.json', function(data) {
   log('Data loaded.');
-  console.log(data.length);
   data = preprocess.processData(data);
 
   log('Initial one-day view.');
+//  oneDay.load(data).locate('2014-03-09T12:00:00');
   oneDay.load(data).locate('2014-05-26T00:00:00');
   // attach click handlers to set up programmatic pan
   $('#tidelineNavForward').on('click', oneDay.panForward);

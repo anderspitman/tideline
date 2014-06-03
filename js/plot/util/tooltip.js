@@ -16,6 +16,7 @@
  */
 
 var d3 = require('../../lib/').d3;
+var moment = require('moment-timezone');
 
 var log = require('../../lib/').bows('Tooltip');
 
@@ -246,17 +247,27 @@ module.exports = function(container, tooltipsGroup) {
     }
 
     if (makeTimestamp) {
-      tooltip.timestamp(d, tooltipGroup, imageX, imageY, textX, textY, tooltipWidth, tooltipHeight);
+      tooltip.timestamp(d, tooltipGroup, imageX, imageY, textX, textY, tooltipWidth, tooltipHeight, selection);
     }
   }
 
-  tooltip.timestamp = function(d, tooltipGroup, imageX, imageY, textX, textY, tooltipWidth, tooltipHeight) {
+  tooltip.timestamp = function(d, tooltipGroup, imageX, imageY, textX, textY, tooltipWidth, tooltipHeight, selection) {
     var magic = timestampHeight * 1.2;
     var timestampY = imageY() - timestampHeight;
     var timestampTextY = timestampY + magic / 2;
 
     var formatTime = d3.time.format.utc('%-I:%M %p');
-    var t = formatTime(new Date(d.normalTime));
+    var tooltipCategory = selection.attr('id');
+    var t;
+    if (tooltipCategory.search('utc') !== -1) {
+      t = formatTime(new Date(d.normalTime));
+    }
+    else if (tooltipCategory.search('pac' !== -1)) {
+      t = moment(d.deviceTime).tz('US/Pacific').format("h:mm a");
+    }
+    else {
+      t = formatTime(new Date(d.normalTime));
+    }
     tooltipGroup.append('rect')
       .attr({
         'x': imageX,

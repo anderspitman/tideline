@@ -17,7 +17,6 @@
 
 var d3 = require('../lib/').d3;
 var _ = require('../lib/')._;
-var moment = require('moment-timezone');
 
 var log = require('../lib/').bows('SMBG');
 var scales = require('./util/scales');
@@ -45,10 +44,6 @@ module.exports = function(pool, opts) {
 
   var getBgBoundaryClass = bgBoundaryClass(opts);
 
-  smbg.dateTransformer = function(d) {
-    return moment(d.deviceTime).tz('US/Pacific').format();
-  };
-
   function smbg(selection) {
     opts.xScale = pool.xScale().copy();
     selection.each(function(currentData) {
@@ -61,7 +56,7 @@ module.exports = function(pool, opts) {
         .append('circle')
         .attr({
           cx: function(d) {
-            return opts.xScale(Date.parse(smbg.dateTransformer(d)));
+            return opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00')));
           },
           cy: function(d) {
             return opts.yScale(d.value);
@@ -95,11 +90,11 @@ module.exports = function(pool, opts) {
   }
 
   smbg.addTooltip = function(d, category) {
-    d3.select('#' + 'tidelineTooltips_smbg_pac')
+    d3.select('#' + 'tidelineTooltips_smbg_raw')
       .call(pool.tooltips(),
         d,
         // tooltipXPos
-        opts.xScale(Date.parse(smbg.dateTransformer(d))),
+        opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00'))),
         'smbg',
         // timestamp
         true,
@@ -107,7 +102,7 @@ module.exports = function(pool, opts) {
         opts.tooltipWidth,
         opts.tooltipHeight,
         // imageX
-        opts.xScale(Date.parse(smbg.dateTransformer(d))),
+        opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00'))),
         // imageY
         function() {
           if ((category === 'low') || (category === 'target')) {
@@ -118,7 +113,7 @@ module.exports = function(pool, opts) {
           }
         },
         // textX
-        opts.xScale(Date.parse(smbg.dateTransformer(d))) + opts.tooltipWidth / 2,
+        opts.xScale(Date.parse(d.normalTime.replace('.000Z', '-07:00'))) + opts.tooltipWidth / 2,
         // textY
         function() {
           if ((category === 'low') || (category === 'target')) {
