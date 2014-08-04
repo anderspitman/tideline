@@ -34,15 +34,13 @@ module.exports = function(pool, opts) {
 
   var mainGroup = pool.parent();
 
-  function getUndelivereds(data) {
+  function getUndelivereds(data, category) {
     var undelivereds = [];
     for (var i = 0; i < data.length; ++i) {
       var d = data[i];
       if (d.suppressed) {
         undelivereds = undelivereds
-          // TODO: eventually we'll want a path for each category of suppresseds
-          // where 'scheduled' is just one such category
-          .concat(_.filter(d.suppressed, function(s) { return s.deliveryType === 'scheduled'; }));
+          .concat(_.filter(d.suppressed, function(s) { return s.deliveryType === category; }));
       }
     }
     // there can be duplicate suppressed segments, not quite sure why this happens
@@ -85,7 +83,11 @@ module.exports = function(pool, opts) {
       var basalPathsGroup = selection.selectAll('.d3-basal-path-group').data(['d3-basal-path-group']);
       basalPathsGroup.enter().append('g').attr('class', 'd3-basal-path-group');
       var paths = basalPathsGroup.selectAll('.d3-basal.d3-path-basal')
-        .data(['d3-basal d3-path-basal', 'd3-basal d3-path-basal d3-path-basal-undelivered']);
+        .data([
+          'd3-basal d3-path-basal',
+          'd3-basal d3-path-basal d3-path-basal-undelivered',
+          'd3-basal d3-path-basal d3-path-basal-undelivered d3-basal-overridden'
+        ]);
       paths.enter().append('path').attr({
         'class': function(d) { return d; },
         'clip-path': 'url(#mainClipPath)'
@@ -93,11 +95,13 @@ module.exports = function(pool, opts) {
 
       // d3.selects are OK here because `paths` is a chained selection
       var actualpath = d3.select(paths[0][0]);
-      var undeliveredPath = d3.select(paths[0][1]);
+      var suppressedScheduled = d3.select(paths[0][1]);
+      var suppressedTemp = d3.select(paths[0][2]);
 
       basal.updatePath(actualpath, currentData);
 
-      basal.updatePath(undeliveredPath, getUndelivereds(currentData));
+      basal.updatePath(suppressedScheduled, getUndelivereds(currentData, 'scheduled'));
+      basal.updatePath(suppressedTemp, getUndelivereds(currentData, 'temp'));
 
       basalSegments.exit().remove();
 
