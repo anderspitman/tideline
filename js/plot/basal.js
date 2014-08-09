@@ -1,4 +1,4 @@
-/* 
+/*
  * == BSD2 LICENSE ==
  * Copyright (c) 2014, Tidepool Project
  * 
@@ -15,11 +15,11 @@
  * == BSD2 LICENSE ==
  */
 
-var d3 = require('../lib/').d3;
-var _ = require('../lib/')._;
+var d3 = require('d3');
+var _ = require('lodash');
 
 var format = require('../data/util/format');
-var log = require('../lib/').bows('Basal');
+var log = require('bows')('Basal');
 
 module.exports = function(pool, opts) {
   opts = opts || {};
@@ -37,11 +37,16 @@ module.exports = function(pool, opts) {
 
   function getUndelivereds(data, category) {
     var undelivereds = [];
+    function isCategory(s) {
+      return s.deliveryType === category;
+    }
     for (var i = 0; i < data.length; ++i) {
       var d = data[i];
       if (d.suppressed) {
         undelivereds = undelivereds
-          .concat(_.filter(d.suppressed, function(s) { return s.deliveryType === category; }));
+          // TODO: eventually we'll want a path for each category of suppresseds
+          // where 'scheduled' is just one such category
+          .concat(_.filter(d.suppressed, isCategory));
       }
     }
     // there can be duplicate suppressed segments, not quite sure why this happens
@@ -84,11 +89,9 @@ module.exports = function(pool, opts) {
       var basalPathsGroup = selection.selectAll('.d3-basal-path-group').data(['d3-basal-path-group']);
       basalPathsGroup.enter().append('g').attr('class', 'd3-basal-path-group');
       var paths = basalPathsGroup.selectAll('.d3-basal.d3-path-basal')
-        .data([
-          'd3-basal d3-path-basal',
+        .data(['d3-basal d3-path-basal',
           'd3-basal d3-path-basal d3-path-basal-undelivered',
-          'd3-basal d3-path-basal d3-path-basal-undelivered d3-basal-overridden'
-        ]);
+          'd3-basal d3-path-basal d3-path-basal-undelivered d3-basal-overridden']);
       paths.enter().append('path').attr({
         'class': function(d) { return d; },
         'clip-path': 'url(#mainClipPath)'
