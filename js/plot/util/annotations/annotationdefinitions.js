@@ -54,6 +54,9 @@ var definitions = {
   LEAD_TEXT: {
     'stats-insufficient-data': function() {
       return 'Why is this grey?';
+    },
+    'stats-how-calculated': function() {
+      return 'How is this data calculated?';
     }
   },
   MAIN_TEXT: {
@@ -99,6 +102,9 @@ var definitions = {
     },
     'stats-insufficient-data': function() {
       return 'There is not enough data to show this statistic.';
+    },
+    'stats-how-calculated': function() {
+      return 'Describe how data is calculated here';
     }
   },
   default: function(source) {
