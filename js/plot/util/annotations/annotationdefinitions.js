@@ -105,6 +105,15 @@ var definitions = {
     },
     'stats-how-calculated': function() {
       return 'Describe how data is calculated here';
+    },
+    'stats-how-calculated-ratio': function() {
+      return 'basal-bolus ratio';
+    },
+    'stats-how-calculated-range': function() {
+      return 'bg time-in-range';
+    },
+    'stats-how-calculated-average': function() {
+      return 'bg average';
     }
   },
   default: function(source) {
