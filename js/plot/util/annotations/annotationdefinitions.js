@@ -109,11 +109,17 @@ var definitions = {
     'stats-how-calculated-ratio': function() {
       return 'basal-bolus ratio';
     },
-    'stats-how-calculated-range': function() {
-      return 'bg time-in-range';
+    'stats-how-calculated-range-cbg': function() {
+      return 'cbg time-in-range';
     },
-    'stats-how-calculated-average': function() {
-      return 'bg average';
+    'stats-how-calculated-range-smbg': function() {
+      return 'smbg time-in-range';
+    },
+    'stats-how-calculated-average-cbg': function() {
+      return 'cbg average';
+    },
+    'stats-how-calculated-average-smbg': function() {
+      return 'smbg average';
     }
   },
   default: function(source) {
