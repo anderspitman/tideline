@@ -56,7 +56,7 @@ var definitions = {
       return 'Why is this grey?';
     },
     'stats-how-calculated': function() {
-      return 'How is this data calculated?';
+      return 'How is this statistic calculated?';
     }
   },
   MAIN_TEXT: {
